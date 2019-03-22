@@ -9,24 +9,58 @@ INSTALL = @INSTALL@
 PREFIX  = @prefix@
 WHEEL   = `awk -F: '$$3 == 0 {print $$1}' /etc/group`
 
-all: $(PROG) $(PROG).$(SECTION)
+.DEFAULT_GOAL:=help
+
+# Automatic self-documentation
+.PHONY: help
+help: ## Display this help
+	@awk 'BEGIN { FS = ":.*## "; tab = 12; color = "\033[36m"; indent = "  "; printf "\nUsage:\n  make " color "<target>\033[0m\n\nRecognized targets:\n" } /^[a-zA-Z0-9%_-]+:.*?## / { pad = sprintf("\n%" tab "s" indent, "", $$2); gsub(/\\n/, pad); printf indent color "%-" tab "s\033[0m%s\n", $$1, $$2 } /^##@ / { gsub(/\\n/, "\n"); printf "\n%s\n", substr($$0, 5) } END { print "" }' $(MAKEFILE_LIST) # v1.43
+
+.PHONY: all
+all: bin mandoc ## Build binary and manpage (all formats)
+	
+.PHONY: bin
+bin: $(PROG) ## Build binary
+	
+.PHONY: man
+man: $(PROG).$(SECTION) ## Generate manpage (nroff format)
+
+.PHONY: mandoc
+mandoc: $(PROG).pdf ## Generate manpage (ps and pdf format)
 
 $(PROG): $(PROG).c
         $(CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" $(PROG).c -o $(PROG)
 
-$(PROG).$(SECTION): $(PROG)
-	pod2man $(PODOPTS) $(PROG).c > $(PROG).$(SECTION)
+$(PROG).$(SECTION): $(PROG).c
+	pod2man $(PODOPTS) $< > $@
 
-test: $(PROG)
-	./$(PROG)
+$(PROG).ps: $(PROG).$(SECTION)
+	groff -man -Tps $< > $@
 
-install: all
+$(PROG).pdf: $(PROG).ps
+	ps2pdf $<
+
+.PHONY: test
+test: $(PROG) ## Run simple tests
+	@./$< 10 sleep 1 && echo "Test 1 successful (no timeout)"
+	@./$< 1 sleep 10 || test $$? -eq 106 && echo "Test 2 successful (timeout)"
+
+.PHONY: install
+install: all ## Copy binary and manpage to system directories
 	$(INSTALL) -o root -g $(WHEEL) -m 755 $(PROG) $(PREFIX)/bin/
 	$(INSTALL) -o root -g $(WHEEL) -m 644 $(PROG).$(SECTION) $(PREFIX)/man/man$(SECTION)/
 
-clean:
-	rm -f $(PROG) $(PROG).$(SECTION)
+.PHONY: clean
+clean: ## Remove the compiled binary
+	rm -f $(PROG)
+	if [ -d maxtime.dSYM ]; then rm -rf maxtime.dSYM; fi
 
-distclean:
-	rm -f $(PROG) $(PROG).$(SECTION) config.* Makefile
+.PHONY: realclean
+realclean: clean ## Remove the binary and manpages
+	rm -f $(PROG).$(SECTION) $(PROG).ps $(PROG).pdf
+
+
+.PHONY: distclean
+distclean: clean ## Cleanup and prepare for distribution
+	rm -f config.* Makefile
 
