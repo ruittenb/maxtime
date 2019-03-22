@@ -41,7 +41,7 @@
 
 // #define DEBUG	1
 
-static const char id[] = "@(#) " ARGV0 " 2004-07-16 version 0.35";
+static const char id[] = "@(#) " ARGV0 " 2019-03-22 version 0.36";
 
 struct itimerval *atimer, *oatimer;
 float period;
@@ -331,6 +331,10 @@ was sent from the keyboard).
 
 =head1 EXAMPLES
 
+Attempt to download a network file, but allow at most 10 seconds:
+
+    maxtime 10 wget http://catb.org/jargon/html/index.html
+
 Request the status of a Baan shared memory segment, but do not lock up if
 shared memory is corrupt:
 
@@ -357,7 +361,7 @@ exit(3), setitimer(2), signal(7), wait(2).
 
 =head1 VERSION
 
-This manual pertains to version 0.35.
+This manual pertains to version 0.36.
 
 =head1 AUTHOR and COPYRIGHT
 
