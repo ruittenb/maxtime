@@ -361,7 +361,7 @@ exit(3), setitimer(2), signal(7), wait(2).
 
 =head1 VERSION
 
-This manual pertains to version 0.36.
+This manual pertains to B<maxtime> version 0.36.
 
 =head1 AUTHOR and COPYRIGHT
 
