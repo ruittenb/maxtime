@@ -374,10 +374,10 @@ This manual pertains to version 0.36.
 .ie n Copyright (c) 2004-2019,
 .el   Copyright \*(co 2004-2019,
 Ren\*(e' Uittenbogaard (ruittenb@users.sourceforge.net).
-.PP \
+.PP
 
 This program is free software; you can redistribute it and/or modify it
-under the terms described by the GNU General Public License version 2.
+under the terms described by the GNU General Public License version 3.
 
 C<maxtime> is distributed without any warranty, even without the
 implied warranties of merchantability or fitness for a particular purpose.
